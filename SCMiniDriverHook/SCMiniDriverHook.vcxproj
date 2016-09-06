@@ -150,6 +150,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="inc_cpdk\cardmod.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="mhook\disasm-lib\cpu.h" />
     <ClInclude Include="mhook\disasm-lib\disasm.h" />
