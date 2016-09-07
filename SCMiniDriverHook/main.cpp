@@ -47,10 +47,9 @@ bool shouldHook() {
 	std::wstring wsPN(wProcessName);//convert wchar* to wstring
 	std::string strProcessName(wsPN.begin(), wsPN.end());
 	if (0 == wcscmp(APP_HOOKING, wProcessName)) {
+		logger = LOGGER::CLogger::getInstance(LOGGER::LogLevel_Info, LOG_PATH, "");
 		if (logger) { logger->TraceInfo("%s is hooking onto a %s", strProcessName.c_str(), DLL_HOOKED); }
 		return true;
-	} else {
-		if (logger) { logger->TraceInfo("%s is NOT hooking onto anything", strProcessName.c_str()); }
 	}
 	return false;
 }
@@ -58,24 +57,20 @@ bool shouldHook() {
 
 //hookInitialize
 void hookInitialize() {
-	if (shouldHook()) {
-		g_hDll = LoadLibrary(DLL_HOOKED_W);
+	g_hDll = LoadLibrary(DLL_HOOKED_W);
 
-		//GetProcAddress
-		pOrigCardAcquireContext = (PFN_CARD_ACQUIRE_CONTEXT)GetProcAddress(g_hDll, "CardAcquireContext");
+	//GetProcAddress
+	pOrigCardAcquireContext = (PFN_CARD_ACQUIRE_CONTEXT)GetProcAddress(g_hDll, "CardAcquireContext");
 
-		//Mhook_SetHook
-		Mhook_SetHook((PVOID*)&pOrigCardAcquireContext, pHookCardAcquireContext);
-	}
+	//Mhook_SetHook
+	Mhook_SetHook((PVOID*)&pOrigCardAcquireContext, pHookCardAcquireContext);
 }
 
 
 //hookFinalize
 void hookFinalize() {
-	if (shouldHook()) {
-		//Mhook_Unhook
-		Mhook_Unhook((PVOID*)&pOrigCardAcquireContext);
-	}
+	//Mhook_Unhook
+	Mhook_Unhook((PVOID*)&pOrigCardAcquireContext);
 }
 
 
@@ -86,11 +81,13 @@ BOOL WINAPI DllMain(
 	__in LPVOID     Reserved
 )
 {
-	logger = LOGGER::CLogger::getInstance(LOGGER::LogLevel_Info, LOG_PATH, "");
-
 	switch (Reason) {
 	case DLL_PROCESS_ATTACH:
-		hookInitialize();
+		if (shouldHook()) {
+			hookInitialize();
+		} else {
+			return FALSE;
+		}
 		break;
 
 	case DLL_PROCESS_DETACH:
