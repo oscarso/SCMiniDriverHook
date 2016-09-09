@@ -33,7 +33,7 @@ pHookCardDeleteContext(
 	if (logger) {
 		logger->TraceInfo("CardDeleteContext");
 	}
-	return g_pCardData->pfnCardDeleteContext(pCardData);
+	return 0;// g_pCardData->pfnCardDeleteContext(pCardData);
 }
 
 
@@ -48,6 +48,21 @@ pHookCardAcquireContext(
 	if (logger) {
 		logger->TraceInfo("CardAcquireContext");
 		logger->TraceInfo("IN dwFlags: %x", dwFlags);
+		logger->TraceInfo("IN pCardData->dwVersion: %d", pCardData->dwVersion);
+		logger->TraceInfo("IN pCardData->pbAtr:");
+		logger->PrintBuffer(pCardData->pbAtr, pCardData->cbAtr);
+		logger->TraceInfo("IN pCardData->pwszCardName:");
+		logger->PrintBuffer(pCardData->pwszCardName, lstrlen(pCardData->pwszCardName));
+		logger->TraceInfo("IN pCardData->pfnCspAlloc: %p", &(pCardData->pfnCspAlloc));
+		logger->TraceInfo("IN pCardData->pfnCspReAlloc: %p", &(pCardData->pfnCspReAlloc));
+		logger->TraceInfo("IN pCardData->pfnCspFree: %p", &(pCardData->pfnCspFree));
+		logger->TraceInfo("IN pCardData->pfnCspCacheAddFile: %p", &(pCardData->pfnCspCacheAddFile));
+		logger->TraceInfo("IN pCardData->pfnCspCacheLookupFile: %p", &(pCardData->pfnCspCacheLookupFile));
+		logger->TraceInfo("IN pCardData->pfnCspCacheDeleteFile: %p", &(pCardData->pfnCspCacheDeleteFile));
+		logger->TraceInfo("IN pCardData->pvCacheContext: %x", pCardData->pvCacheContext);
+		logger->TraceInfo("IN pCardData->pfnCspPadData: %p", &(pCardData->pfnCspPadData));
+		logger->TraceInfo("IN pCardData->hSCardCtx: %x", pCardData->hSCardCtx);
+		logger->TraceInfo("IN pCardData->hScard: %x", pCardData->hScard);
 	}
 	
 	dwRet = pOrigCardAcquireContext(pCardData, dwFlags);
