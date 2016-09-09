@@ -13,10 +13,28 @@
 #define				DLL_HOOKED		"msclmd.dll"
 LOGGER::CLogger*	logger = NULL;
 HMODULE				g_hDll = 0;
+PCARD_DATA			g_pCardData = 0;
 
 
-//initialization of MS Class Mini-driver API function pointers
+// Local Functions
+void hookInitializeOther(IN	PCARD_DATA	pCardData);
+
+
+// Initialization of MS Class Mini-driver API function pointers
 PFN_CARD_ACQUIRE_CONTEXT	pOrigCardAcquireContext = NULL;
+
+
+//CardDeleteContext
+DWORD WINAPI
+pHookCardDeleteContext(
+	__inout		PCARD_DATA	pCardData
+)
+{
+	if (logger) {
+		logger->TraceInfo("CardDeleteContext");
+	}
+	return g_pCardData->pfnCardDeleteContext(pCardData);
+}
 
 
 //CardAcquireContext
@@ -26,11 +44,22 @@ pHookCardAcquireContext(
 	__in	DWORD		dwFlags
 )
 {
+	DWORD	dwRet;
 	if (logger) {
 		logger->TraceInfo("CardAcquireContext");
 		logger->TraceInfo("IN dwFlags: %x", dwFlags);
 	}
-	return pOrigCardAcquireContext(pCardData, dwFlags);
+	
+	dwRet = pOrigCardAcquireContext(pCardData, dwFlags);
+
+	g_pCardData = (PCARD_DATA)calloc(1, sizeof(CARD_DATA));
+	memcpy((PCARD_DATA)g_pCardData, (PCARD_DATA)pCardData, sizeof(CARD_DATA));
+	logger->TraceInfo("g_pCardData->cbAtr: %d", g_pCardData->cbAtr);
+	logger->TraceInfo("g_pCardData->dwVersion: %d", g_pCardData->dwVersion);
+	logger->TraceInfo("g_pCardData->pfnCardDeleteContext: 0x%p", &(g_pCardData->pfnCardDeleteContext));
+
+	//hookInitializeOther(g_pCardData);
+	return dwRet;
 }
 
 
@@ -63,7 +92,14 @@ void hookInitialize() {
 	pOrigCardAcquireContext = (PFN_CARD_ACQUIRE_CONTEXT)GetProcAddress(g_hDll, "CardAcquireContext");
 
 	//Mhook_SetHook
-	Mhook_SetHook((PVOID*)&pOrigCardAcquireContext, pHookCardAcquireContext);
+	Mhook_SetHook((PVOID *)&pOrigCardAcquireContext, pHookCardAcquireContext);
+}
+
+
+//hookInitializeOther
+void hookInitializeOther(IN	PCARD_DATA	pCardData) {
+	//Mhook_SetHook
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardDeleteContext), pHookCardDeleteContext);
 }
 
 
