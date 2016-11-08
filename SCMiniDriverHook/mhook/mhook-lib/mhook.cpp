@@ -42,7 +42,7 @@
 //=========================================================================
 #ifndef ODPRINTF
 
-#if 0 //def _DEBUG
+#ifdef _DEBUG
 #define ODPRINTF(a) odprintf a
 #else
 #define ODPRINTF(a)
