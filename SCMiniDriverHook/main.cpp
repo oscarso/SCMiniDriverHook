@@ -330,7 +330,6 @@ void hookInitialize() {
 //hookInitializeOther
 void hookInitializeOther(IN	PCARD_DATA	pCardData) {
 	//Mhook_SetHook
-
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardDeleteContext), pHookCardDeleteContext);
 #if 0
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardAuthenticatePin), pHookCardAuthenticatePin);
