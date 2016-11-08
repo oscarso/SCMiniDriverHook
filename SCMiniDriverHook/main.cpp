@@ -8,7 +8,7 @@
 
 // Global Variables
 #define				LOG_PATH		"C:\\Logs\\"
-#define				APP_HOOKING		L"C:\\Windows\\system32\\CertUtil.exe"
+#define				APP_HOOKING		L"C:\\Windows\\system32\\certutil.exe"
 #define				DLL_HOOKED_W	L"msclmd.dll"
 #define				DLL_HOOKED		"msclmd.dll"
 LOGGER::CLogger*	logger = NULL;
@@ -104,6 +104,7 @@ bool shouldHook() {
 	if (0 == wcscmp(APP_HOOKING, wProcessName)) {
 		logger = LOGGER::CLogger::getInstance(LOGGER::LogLevel_Info, LOG_PATH, "");
 		if (logger) { logger->TraceInfo("%s is calling %s", strProcessName.c_str(), DLL_HOOKED); }
+		OutputDebugString(L"SCMiniDriverHook: shouldHook returns TRUE");
 		return true;
 	}
 	return false;
