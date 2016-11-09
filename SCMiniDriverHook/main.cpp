@@ -39,7 +39,7 @@ pHookCardAcquireContext(
 	__in	DWORD		dwFlags
 )
 {
-	DWORD	dwRet;
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
 		logger->TraceInfo("CardAcquireContext");
 		logger->TraceInfo("IN dwFlags: %x", dwFlags);
@@ -79,10 +79,14 @@ pHookCardDeleteContext(
 	__inout		PCARD_DATA	pCardData
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardDeleteContext");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####     CardDeleteContext     #####");
+		logger->TraceInfo("#####################################");
 	}
-	return g_pCardData->pfnCardDeleteContext(pCardData);
+	dwRet = g_pCardData->pfnCardDeleteContext(pCardData);
+	return dwRet;
 }
 
 
@@ -97,8 +101,11 @@ pHookCardCreateContainer(
 	__in	PBYTE		pbKeyData
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardCreateContainer");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardCreateContainer    #####");
+		logger->TraceInfo("#####################################");
 	}
 	return g_pCardData->pfnCardCreateContainer(pCardData, bContainerIndex, dwFlags, dwKeySpec, dwKeySize, pbKeyData);
 }
@@ -112,8 +119,11 @@ pHookCardDeleteContainer(
 	__in	DWORD			dwReserved
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardDeleteContainer");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardDeleteContainer    #####");
+		logger->TraceInfo("#####################################");
 	}
 	return g_pCardData->pfnCardDeleteContainer(pCardData, bContainerIndex, dwReserved);
 }
@@ -128,8 +138,13 @@ pHookCardGetContainerInfo(
 	__in	PCONTAINER_INFO	pContainerInfo
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardGetContainerInfo");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardGetContainerInfo    #####");
+		logger->TraceInfo("######################################");
+		logger->TraceInfo("IN bContainerIndex: %d", bContainerIndex);
+		logger->TraceInfo("IN dwFlags: %x", dwFlags);
 	}
 	return g_pCardData->pfnCardGetContainerInfo(pCardData, bContainerIndex, dwFlags, pContainerInfo);
 }
@@ -147,8 +162,11 @@ pHookCardGetContainerProperty(
 	__in	DWORD										dwFlags
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardGetContainerProperty");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####   CardGetContainerProperty   #####");
+		logger->TraceInfo("########################################");
 	}
 	return g_pCardData->pfnCardGetContainerProperty(pCardData, bContainerIndex, wszProperty, pbData, cbData, pdwDataLen, dwFlags);
 }
@@ -165,8 +183,11 @@ pHookCardSetContainerProperty(
 	__in	DWORD					dwFlags
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardSetContainerProperty");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####   CardSetContainerProperty   #####");
+		logger->TraceInfo("########################################");
 	}
 	return g_pCardData->pfnCardSetContainerProperty(pCardData, bContainerIndex, wszProperty, pbData, cbDataLen, dwFlags);
 }
@@ -182,10 +203,21 @@ pHookCardAuthenticatePin(
 	__out_opt				PDWORD		pcAttemptsRemaining
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardAuthenticatePin");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardAuthenticatePin    #####");
+		logger->TraceInfo("#####################################");
+		char userID[MAX_PATH] = { 0 };
+		wcstombs(userID, pwszUserId, wcslen(pwszUserId));
+		logger->TraceInfo("IN pwszUserId: %s", userID);
+		logger->TraceInfo("IN pbPin");
+		logger->PrintBuffer(pbPin, cbPin);
+		logger->TraceInfo("IN pcAttemptsRemaining: %p", pcAttemptsRemaining);
 	}
-	return g_pCardData->pfnCardAuthenticatePin(pCardData, pwszUserId, pbPin, cbPin, pcAttemptsRemaining);
+	dwRet = g_pCardData->pfnCardAuthenticatePin(pCardData, pwszUserId, pbPin, cbPin, pcAttemptsRemaining);
+
+	return dwRet;
 }
 
 
@@ -200,10 +232,24 @@ pHookCardReadFile(
 	__out							PDWORD		pcbData
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardReadFile");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardReadFile    #####");
+		logger->TraceInfo("##############################");
+		logger->TraceInfo("IN pszDirectoryName: %s", pszDirectoryName);
+		logger->TraceInfo("IN pszFileName: %s", pszFileName);
+		logger->TraceInfo("IN dwFlags: %x", dwFlags);
 	}
-	return g_pCardData->pfnCardReadFile(pCardData, pszDirectoryName, pszFileName, dwFlags, ppbData, pcbData);
+	dwRet = g_pCardData->pfnCardReadFile(pCardData, pszDirectoryName, pszFileName, dwFlags, ppbData, pcbData);
+
+	if (logger) {
+		logger->TraceInfo("OUT: *pcbData = %d", *pcbData);
+		logger->TraceInfo("OUT: *ppbData");
+		logger->PrintBuffer(*ppbData, *pcbData);
+		logger->TraceInfo("CardReadFile returns %x", dwRet);
+	}
+	return dwRet;
 }
 
 
@@ -218,10 +264,20 @@ pHookCardWriteFile(
 	__in					DWORD		cbData
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardWriteFile");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardWriteFile    #####");
+		logger->TraceInfo("###############################");
+		logger->TraceInfo("IN pszDirectoryName: %s", pszDirectoryName);
+		logger->TraceInfo("IN pszFileName: %s", pszFileName);
+		logger->TraceInfo("IN dwFlags: %x", dwFlags);
+		logger->TraceInfo("IN pbData:");
+		logger->PrintBuffer(pbData, cbData);
 	}
-	return g_pCardData->pfnCardWriteFile(pCardData, pszDirectoryName, pszFileName, dwFlags, pbData, cbData);
+	dwRet = g_pCardData->pfnCardWriteFile(pCardData, pszDirectoryName, pszFileName, dwFlags, pbData, cbData);
+
+	return dwRet;
 }
 
 
@@ -236,10 +292,26 @@ pHookCardGetProperty(
 	__in	DWORD										dwFlags
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardGetProperty");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####   CardGetProperty   #####");
+		logger->TraceInfo("###############################");
+		char prop[MAX_PATH] = { 0 };
+		wcstombs(prop, wszProperty, wcslen(wszProperty));
+		logger->TraceInfo("IN wszProperty: %s", prop);
+		logger->TraceInfo("IN cbData: %d", cbData);
+		logger->TraceInfo("IN dwFlags: %x", dwFlags);
 	}
-	return g_pCardData->pfnCardGetProperty(pCardData, wszProperty, pbData, cbData, pdwDataLen, dwFlags);
+	dwRet = g_pCardData->pfnCardGetProperty(pCardData, wszProperty, pbData, cbData, pdwDataLen, dwFlags);
+
+	if (logger) {
+		logger->TraceInfo("OUT: pbData:");
+		logger->PrintBuffer(pbData, cbData);
+		logger->TraceInfo("OUT: *pdwDataLen: %d", *pdwDataLen);
+		logger->TraceInfo("CardGetProperty returns %x", dwRet);
+	}
+	return dwRet;
 }
 
 
@@ -253,10 +325,19 @@ pHookCardSetProperty(
 	__in	DWORD					dwFlags
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardSetProperty");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####   CardSetProperty   #####");
+		logger->TraceInfo("###############################");
+		char prop[MAX_PATH] = { 0 };
+		wcstombs(prop, wszProperty, wcslen(wszProperty));
+		logger->TraceInfo("IN wszProperty: %s", prop);
+		logger->TraceInfo("IN cbDataLen: %d", cbDataLen);
+		logger->TraceInfo("IN dwFlags: %x", dwFlags);
 	}
-	return g_pCardData->pfnCardSetProperty(pCardData, wszProperty, pbData, cbDataLen, dwFlags);
+	dwRet = g_pCardData->pfnCardSetProperty(pCardData, wszProperty, pbData, cbDataLen, dwFlags);
+	return dwRet;
 }
 
 
@@ -268,10 +349,22 @@ pHookCardQueryFreeSpace(
 	__in	PCARD_FREE_SPACE_INFO	pCardFreeSpaceInfo
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardQueryFreeSpace");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardQueryFreeSpace    #####");
+		logger->TraceInfo("####################################");
+		logger->TraceInfo("IN dwFlags: %x", dwFlags);
 	}
-	return g_pCardData->pfnCardQueryFreeSpace(pCardData, dwFlags, pCardFreeSpaceInfo);
+	dwRet = g_pCardData->pfnCardQueryFreeSpace(pCardData, dwFlags, pCardFreeSpaceInfo);
+
+	if (logger) {
+		logger->TraceInfo("OUT dwVersion: %x", pCardFreeSpaceInfo->dwVersion);
+		logger->TraceInfo("OUT dwBytesAvailable: %x", pCardFreeSpaceInfo->dwBytesAvailable);
+		logger->TraceInfo("OUT dwKeyContainersAvailable: %x", pCardFreeSpaceInfo->dwKeyContainersAvailable);
+		logger->TraceInfo("OUT dwMaxKeyContainers: %x", pCardFreeSpaceInfo->dwMaxKeyContainers);
+	}
+	return dwRet;
 }
 
 
@@ -282,10 +375,20 @@ pHookCardQueryCapabilities(
 	__in	PCARD_CAPABILITIES	pCardCapabilities
 )
 {
+	DWORD	dwRet = SCARD_S_SUCCESS;
 	if (logger) {
-		logger->TraceInfo("CardQueryCapabilities");
+		logger->TraceInfo("\n");
+		logger->TraceInfo("#####    CardQueryCapabilities    #####");
+		logger->TraceInfo("#######################################");
 	}
-	return g_pCardData->pfnCardQueryCapabilities(pCardData, pCardCapabilities);
+	dwRet = g_pCardData->pfnCardQueryCapabilities(pCardData, pCardCapabilities);
+
+	if (logger) {
+		logger->TraceInfo("OUT: dwVersion: %x", pCardCapabilities->dwVersion);
+		logger->TraceInfo("OUT: fCertCompress: %s", pCardCapabilities->fCertificateCompression ? "TRUE" : "FALSE");
+		logger->TraceInfo("OUT: fKeyGen: %s", pCardCapabilities->fKeyGen ? "TRUE" : "FALSE");
+	}
+	return dwRet;
 }
 
 
@@ -330,23 +433,23 @@ void hookInitialize() {
 //hookInitializeOther
 void hookInitializeOther(IN	PCARD_DATA	pCardData) {
 	//Mhook_SetHook
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardDeleteContext), pHookCardDeleteContext);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardReadFile), pHookCardReadFile);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardWriteFile), pHookCardWriteFile);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardGetProperty), pHookCardGetProperty);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardSetProperty), pHookCardSetProperty);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardQueryFreeSpace), pHookCardQueryFreeSpace);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardQueryCapabilities), pHookCardQueryCapabilities);
+
 #if 0
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardAuthenticatePin), pHookCardAuthenticatePin);
 
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardReadFile), pHookCardReadFile);
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardWriteFile), pHookCardWriteFile);
+	Mhook_SetHook((PVOID *)&(pCardData->pfnCardDeleteContext), pHookCardDeleteContext);
 
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardCreateContainer), pHookCardCreateContainer);
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardDeleteContainer), pHookCardDeleteContainer);
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardGetContainerInfo), pHookCardGetContainerInfo);
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardGetContainerProperty), pHookCardGetContainerProperty);
 	Mhook_SetHook((PVOID *)&(pCardData->pfnCardSetContainerProperty), pHookCardSetContainerProperty);
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardGetProperty), pHookCardGetProperty);
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardSetProperty), pHookCardSetProperty);
-
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardQueryFreeSpace), pHookCardQueryFreeSpace);
-	Mhook_SetHook((PVOID *)&(pCardData->pfnCardQueryCapabilities), pHookCardQueryCapabilities);
 #endif
 }
 
