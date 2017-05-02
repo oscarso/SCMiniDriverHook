@@ -6,11 +6,14 @@
 #include "inc_cpdk\cardmod.h"
 
 
+//Refer to: https://www.codeproject.com/Articles/49319/Easy-way-to-set-up-global-API-hooks
+
+
 // Global Variables
 #define				LOG_PATH		"C:\\Logs\\"
-#define				APP_HOOKING		L"C:\\Windows\\system32\\certutil.exe" //Case Sensitive!!!
-#define				DLL_HOOKED_W	L"msclmd.dll"
-#define				DLL_HOOKED		"msclmd.dll"
+#define				APP_HOOKING		L"C:\\Windows\\system32\\LogonUI.exe" //Case Sensitive!!!
+#define				DLL_HOOKED_W	L"msclmd.dll"//L"ykmd.dll"
+#define				DLL_HOOKED		"msclmd.dll"//"ykmd.dll"
 LOGGER::CLogger*	logger = NULL;
 HMODULE				g_hDll = 0;
 PCARD_DATA			g_pCardData = 0;
@@ -404,13 +407,13 @@ bool shouldHook() {
 	GetModuleFileName(NULL, wProcessName, MAX_PATH);
 	std::wstring wsPN(wProcessName);//convert wchar* to wstring
 	std::string strProcessName(wsPN.begin(), wsPN.end());
-	//OutputDebugString(L"SCMiniDriverHook: shouldHook - ProcessName:");
-	//OutputDebugString(wProcessName);
+	OutputDebugString(L"SCMiniDriverHook: shouldHook - ProcessName:");
+	OutputDebugString(wProcessName);
 	if (logger) { logger->TraceInfo("ProcessName is: %s", strProcessName.c_str()); }
 	if (0 == wcscmp(APP_HOOKING, wProcessName)) {
 		logger = LOGGER::CLogger::getInstance(LOGGER::LogLevel_Info, LOG_PATH, "");
 		if (logger) { logger->TraceInfo("%s is calling %s", strProcessName.c_str(), DLL_HOOKED); }
-		//OutputDebugString(L"SCMiniDriverHook: shouldHook returns TRUE");
+		OutputDebugString(L"SCMiniDriverHook: shouldHook returns TRUE");
 		return true;
 	}
 	return false;

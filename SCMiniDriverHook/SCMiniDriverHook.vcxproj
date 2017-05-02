@@ -108,7 +108,7 @@
       <AdditionalOptions>/integritycheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>signtool sign /v /ph /s YubicoTestStore /n Yubico.com(Test) ..\x64\Debug\SCMiniDriverHook.dll</Command>
+      <Command>signtool sign /v /ph /s YubicoTestStore /n TestSignMinidriver2017 ..\x64\Debug\SCMiniDriverHook.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -146,7 +146,7 @@
       <AdditionalOptions>/integritycheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>signtool sign /v /ph /s YubicoTestStore /n Yubico.com(Test) ..\x64\Release\SCMiniDriverHook.dll</Command>
+      <Command>signtool sign /v /ph /s YubicoTestStore /n TestSignMinidriver2017 ..\x64\Release\SCMiniDriverHook.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
